@@ -40,4 +40,24 @@ app.post("/api/notes", (req,res) => {
 })
 
 //===================DELETE A NOTE FROM THE ARRAY========================//
+app.delete("/api/notes/:id", (req, res) => {
+    const id = req.params.id;
+    let found;
+    allNotes.forEach((n, index) => {
+        if(id ==n.id){
+            allNotes.splice(index,1)
+            let notesCopy = notes.slice();
+            let jNotes = JSON.stringify(notesCopy)
+            fs.writeFile("./db/db.json", jNotes, function(err){
+                if (err) {
+                    return console.log(err);
+                }
+                console.log("NOTE DELETED")
+            })
+
+        }
+    })
+    res.json(true);
+})
+
 }
