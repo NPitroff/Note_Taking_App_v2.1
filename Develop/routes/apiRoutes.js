@@ -1,26 +1,51 @@
-//===================================DECLARE ROUTER AND STORE VARIABLES====================//
-const router = require("express").Router();
-const store = require("../db/store");
+//=================================DECLARE VARIABLES FOR PATH=============================//
+const fs = require('fs');
+const db = require("../db/db.json");
+const id = require("../db/runningID.json")
 //=================================GET API FOR ALL NOTES IN ARRAY=========================//
-router.get("/notes", function(req,res){
-    store
-    .getNotes()
-    .then(notes => res.json(notes))
-    .catch(err => res.status(500).json(err));
-});
+function saveNotes() {
+    fs.writeFileSync("db/db.json", JSON.stringify(db));
+}
 
-router.post("/notes",(req,res) =>{
-    store
-    .addNote(req.body)
-    .then((note) => res.json(note))
-    .catch(err => res.status(500).json(err));
-});
-//========================DELETE API TO REMOVE NOTES=======================================//
-router.delete("/notes/:id", function(req, res) {
-    store
-      .removeNote(req.params.id)
-      .then(() => res.json({ ok: true }))
-      .catch(err => res.status(500).json(err));
-  });
-  
-  module.exports = router;
+function saveNoteID() {
+    fs.writeFileSync("db/runningID.json", JSON.stringify(id));
+}
+
+module.exports = (app) => {
+    app.get("/api/notes", (req, res) => {
+        res.json(db);
+    });
+
+    app.post("/api/notes", (req, res) => {
+        const newReq = req.body;
+        id.noteID += 1;
+        newReq.id = id.noteID;
+        db.push(newReq);
+        res.json(newReq);
+
+        saveNotes();
+        saveNoteID();
+
+        // console.log(newReq);
+        // console.log(id);
+    });
+
+    app.delete("/api/notes/:id", (req, res) => {
+        let matchedNote = false;
+        db.forEach((element, index) => {
+            if(element.id == req.params.id) {
+                matchedNote = true;
+                db.splice(index,1);
+                saveNotes();
+            }
+        });
+        
+        if(!matchedNote) {
+            res.json({ ok: false });
+        }
+        else {
+            res.json({ ok: true });
+        }
+        
+    });
+};
