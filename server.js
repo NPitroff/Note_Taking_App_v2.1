@@ -9,8 +9,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 app.use(express.static('public'));
 //=================DECLARE ROUTES FOR FILE ACCESS=============================//
-require("./routes/apiRoutes")(app);
-require("./routes/htmlRoutes")(app);
+require("./Develop/routes/apiRoutes")(app);
+require("./Develop/routes/htmlRoutes")(app);
 //=================COMMAND TO START THE SERVER================================//
 app.listen(PORT, () =>{
     console.log("SERVER IS LISTENING AT PORT 8080.")
